@@ -1,8 +1,13 @@
 package me.kira.practice.hackerrank;
 
-import java.sql.Date;
+import javax.xml.transform.Result;
+import java.io.*;
+import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * This class was created to solve the following HackerRank Exercise:
@@ -29,22 +34,16 @@ public class JavaDateAndTime {
     */
 
    public static String findDay(int month, int day, int year) {
-      Calendar local = Calendar.getInstance();
-      local.set(year, month, day);
-      int dayOfWeek = local.get(Calendar.DAY_OF_WEEK);
-      if(dayOfWeek == 1)
-         return "SUNDAY";
-      else if(dayOfWeek == 2)
-         return "MONDAY";
-      else if(dayOfWeek == 3)
-         return "TUESDAY";
-      else if(dayOfWeek == 4)
-         return "WEDNESDAY";
-      else if(dayOfWeek == 5)
-         return "THURSDAY";
-      else if(dayOfWeek == 6)
-         return "FRIDAY";
-      else
-         return "SATURDAY";
+      Calendar c = Calendar.getInstance();
+      c.set(Calendar.MONTH, month-1);
+      c.set(Calendar.DAY_OF_MONTH, day);
+      c.set(Calendar.YEAR, year);
+      return c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US).toUpperCase();
+   }
+
+   public static void main(String[] args) throws IOException {
+
+      String res = findDay(8,5,2015);
+      System.out.println(res);
    }
 }
