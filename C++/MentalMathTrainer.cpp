@@ -19,11 +19,11 @@ static uniform_int_distribution<unsigned int> dist;
 
 int add(int a, int b){ return a + b;}
 int sub(int a, int b){ return a - b;}
-float div(float a, float b){ return a / b;}
+float divide(float a, float b){ return a / b;}
 float mul(float a, float b){ return a*b;}
-float log( int base, int a){ return div(log2(a), log2(base));}
+float log(float base, int a){ return divide(log2(a), log2(base));}
 float trig(int binCosSinTan, float trigParam){
-    x *= (180/M_PI);
+    trigParam *= (M_PI/180);
     switch(binCosSinTan){
         case 0:
             return sin(trigParam);
@@ -31,29 +31,31 @@ float trig(int binCosSinTan, float trigParam){
             return cos(trigParam);
         case 2:
             return tan(trigParam);
+        default:
+            exit(-1);
     }
 }
 float power(float root, float rootee){
     return powf(rootee, root);
 }
 
-bool checker(int sum, int answer){
+bool checker(float sum, float answer){
     float ratio = answer/sum;
-    if(ratio == 1) {
-        cout << "Correct!";
+    if(ratio <= 1.05 && ratio >= 0.95) {
+        cout << "Correct!\n";
         return true;
     }
-    else if(ratio > 1)
-        cout << "Too high...";
+    else if(ratio > 1.05)
+        cout << "Too high...\n";
     else
-        cout << "Too low...";
+        cout << "Too low...\n";
     return false;
 }
 
-bool addition(){
+void addition(){
     cout << "Welcome to the Addition Module\n"
          << "What are we training today?\n"
-         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back\n"
          << "Enter the number of your choice:\n";
 
     choice:
@@ -71,26 +73,24 @@ bool addition(){
             dist = uniform_int_distribution<unsigned int>(1000,9999);
             break;
         case '4':
-            return false;
-            break;
+            return;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.";
             goto choice;
     }
-    choice2:
     cout << "Beginning Training...\n";
     int a, b, answer = 1;
     while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " + " << b << endl;
         cin >> answer;
-        checker(add(a, b), answer)
+        checker(add(a, b), answer);
     }
 }
-bool subtraction(){
+void subtraction(){
     cout << "Welcome to the Subtraction Module\n"
          << "What are we training today?\n"
-         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back\n"
          << "Enter the number of your choice:\n";
 
     choice:
@@ -108,26 +108,24 @@ bool subtraction(){
             dist = uniform_int_distribution<unsigned int>(1000,9999);
             break;
         case '4':
-            return false;
-            break;
+            return;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.";
             goto choice;
     }
-    choice2:
     cout << "Beginning Training...\n";
     int a, b, answer = 1;
     while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " - " << b << endl;
         cin >> answer;
-        checker(sub(a, b), answer)
+        checker(sub(a, b), answer);
     }
 }
-bool division(){
+void division(){
     cout << "Welcome to the Division Module\n"
          << "What are we training today?\n"
-         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back\n"
          << "Enter the number of your choice:\n";
 
     choice:
@@ -145,27 +143,25 @@ bool division(){
             dist = uniform_int_distribution<unsigned int>(1000,9999);
             break;
         case '4':
-            return false;
-            break;
+            return;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.";
             goto choice;
     }
-    choice2:
     cout << "Beginning Training...\n";
 
     int a, b, answer = 1;
     while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " / " << b << endl;
-        cin >> answer
-        checker(div(a, b), answer)
+        cin >> answer;
+        checker(divide(a, b), answer);
     }
 }
-bool multiplication(){
+void multiplication(){
     cout << "Welcome to the Multiplication Module\n"
          << "What are we training today?\n"
-         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back\n"
          << "Enter the number of your choice:\n";
 
     choice:
@@ -183,139 +179,145 @@ bool multiplication(){
             dist = uniform_int_distribution<unsigned int>(1000,9999);
             break;
         case '4':
-            return false;
-            break;
+            return;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.";
             goto choice;
     }
-    choice2:
     cout << "Beginning Training...\n";
     int a, b, answer = 1;
     while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " * " << b << endl;
         cin >> answer;
-        checker(mul(a, b), answer)
+        checker(mul(a, b), answer);
     }
 }
-bool logarithm(){
-    cout << "Welcome to the Addition Module\n"
+void logarithm(){
+    cout << "Welcome to the Logarithm Module\n"
          << "What are we training today?\n"
-         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "1. Bases 2-1000\n2. Bases 1000+ \n3. Decimal Bases (10^-1 - 10)\n 4. Anything (10^-4 - 1000+)\n 5. Back\n"
          << "Enter the number of your choice:\n";
 
     choice:
     char choice;
     cin >> choice;
+    uniform_real_distribution<float> dist2;
+    dist = uniform_int_distribution<unsigned int>(2,1000000000);
     switch(choice){
         case '1': // 2
-            dist = uniform_int_distribution<unsigned int>(10,99); //setup distribution
+            dist2 = uniform_real_distribution<float>(2, 1000);
             break;
         case '2': // 3
-            dist = uniform_int_distribution<unsigned int>(100,999);
+            dist2 = uniform_real_distribution<float>(1000, INFINITY);
             break;
-
         case '3': // 4
-            dist = uniform_int_distribution<unsigned int>(1000,9999);
+            dist2 = uniform_real_distribution<float>(0.1, 10);
             break;
-        case '4':
-            return false;
+        case '4': // 4
+            dist2 = uniform_real_distribution<float>(0.0001, INFINITY);
             break;
+        case '5':
+            return;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.";
             goto choice;
     }
-    choice2:
-    cout << "Beginning Training...\n";
-    int a, b, answer = 1;
+        cout << "Beginning Training...\n";
+    float a, b, answer = 1;
     while(answer){
-        a = dist(mt), b = dist(mt);
-        cout << "Log base " << b << "(" << a << ")" << endl;
+        a = dist(mt), b = dist2(mt);
+        cout << "Log base " << b << "( " << a << " )" << endl;
         cin >> answer;
-        checker(log(b, a), answer)
+        checker(log(b, a), answer);
     }
 }
-bool powers(){
+void powers(){
     cout << "Welcome to the Powers Module\n"
          << "What are we training today?\n"
-         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "1. Powers (2-100) (Whole Number Base)\n2. Powers (2-100) Decimals s" //Powers
+            "\n3. Roots (1/2 -> 1/100) Whole Base (100 -> 10000000)\n 4. Roots on Whole Base (Big)\n5. Back\n"
          << "Enter the number of your choice:\n";
 
     choice:
     char choice;
     cin >> choice;
+    uniform_real_distribution<float> dist2;
     switch(choice){
         case '1': // 2
-            dist = uniform_int_distribution<unsigned int>(10,99); //setup distribution
+            dist2 = uniform_real_distribution<float>(2, 100);
+            dist = uniform_int_distribution<unsigned int>(2, 100);
             break;
         case '2': // 3
-            dist = uniform_int_distribution<unsigned int>(100,999);
+            dist2 = uniform_real_distribution<float>(2, 100);
+            dist = uniform_int_distribution<unsigned int>(2, 100);
             break;
-
         case '3': // 4
-            dist = uniform_int_distribution<unsigned int>(1000,9999);
+            dist2 = uniform_real_distribution<float>(0.5, 0.01);
+            dist = uniform_int_distribution<unsigned int>(100, 10000000);
             break;
-        case '4':
-            return false;
+        case '4': // 4
+            dist2 = uniform_real_distribution<float>(0.1, 0.00001);
+            dist = uniform_int_distribution<unsigned int>(10000, 1000000000);
             break;
+        case '5':
+            return;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.";
             goto choice;
     }
-    choice2:
     cout << "Beginning Training...\n";
     int a, b, answer = 1;
     while(answer){
-        a = dist(mt), b = dist(mt);
+        a = dist2(mt), b = dist(mt);
         cout << a << " + " << b << endl;
-        cin >> answer
-        checker(power(a, b), answer)
+        cin >> answer;
+        checker(power(a, b), answer);
     }
 }
-bool trigonometry(){
-    cout << "Welcome to the Trigonometry Module\n"
+void trigonometry(){
+    cout << "Welcome to the Trigonometry Module. All values are in Degrees\n"
          << "What are we training today?\n"
-         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "1. Sin \n2. Cos\n3. Tan\n 4. Back\n"
          << "Enter the number of your choice:\n";
 
     choice:
     char choice;
+    int cossintan;
+    string func;
     cin >> choice;
+    uniform_real_distribution<float> dist2 = uniform_real_distribution<float>(0, 360);
     switch(choice){
         case '1': // 2
-            dist = uniform_int_distribution<unsigned int>(10,99); //setup distribution
+            cossintan = 1;
+            func = "Sine";
             break;
         case '2': // 3
-            dist = uniform_int_distribution<unsigned int>(100,999);
+            cossintan = 0;
+            func = "Cosine";
             break;
-
         case '3': // 4
-            dist = uniform_int_distribution<unsigned int>(1000,9999);
+            cossintan = 2;
+            func = "Tangent";
             break;
         case '4':
-            return false;
-            break;
+            return;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.";
             goto choice;
     }
-    choice2:
     cout << "Beginning Training...\n";
-    int a, b, answer = 1;
+    float a, answer = 1;
     while(answer){
-        a = dist(mt), b = dist(mt);
-        cout << a << " + " << b << endl;
-        cin >> answer
-        checker(add(a, b), cin)
+        a = dist2(mt);
+        cout << func << " " << a << " = ";
+        cin >> answer;
+        checker(trig(cossintan, a), answer);
     }
 }
-
-
-
-
 
 int main(){
+    beginning:
     cout << "Welcome to the Mental Math Trainer\n"
          << "What are we training today?\n"
          << "1. Addition\n2. Subtraction\n3. Division\n4. Multiplication\n5. Square Roots\n6. Logs\n7. Trigonometry\n8. Quit\n"
@@ -341,7 +343,7 @@ int main(){
             break;
 
         case '5':
-            squareroot();
+            powers();
             break;
 
         case '6':
@@ -354,11 +356,11 @@ int main(){
 
         case '8':
             goto end;
-            break;
         default:
-            cout << "Sorry I didnt understand that."
+            cout << "Sorry I didnt understand that.\n";
             goto choice;
     }
+    if(choice) goto beginning;
     end:
     return 0;
 }
