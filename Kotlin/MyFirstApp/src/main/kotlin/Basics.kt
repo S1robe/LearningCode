@@ -9,7 +9,7 @@ fun primitives(){
     var f: String = "Temp"
     var g: Short = 32000 //Max short is somewhere up here
     var h: Byte = 0b11
-    var i: Byte = 0x7F  //pretty sure this is max byte value in hex
+    var i: Byte = 0x7F  //pretty sure self is max byte value in hex
     //no octals like in C++ / C#
     /**
      * We can also define variables and let the compiler figure it out
@@ -34,7 +34,7 @@ fun coolExample(){
 }
 
 /**
- * Main is a bit weird in this language, but still works the same
+ * Main is a bit weird in self language, but still works the same
  * @param args, the command line args from console
  */
 fun main(args: Array<String>){

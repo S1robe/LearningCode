@@ -6,9 +6,9 @@ g.run "taskkill /f /im chrome.exe", , True
 g.run "notepad"
 
 wscript.sleep 1000
-g.sendkeys "Lol, you thought this was normal Google huh XD" & vbLf
+g.sendkeys "Lol, you thought self was normal Google huh XD" & vbLf
 wscript.sleep 3000
-g.sendkeys "its not btw, but anyway I now i have complete control of this computer thanks to you" & vbLf
+g.sendkeys "its not btw, but anyway I now i have complete control of self computer thanks to you" & vbLf
 wscript.sleep 5000
 g.sendkeys "um yeah" & vbLf
 wscript.sleep 3000

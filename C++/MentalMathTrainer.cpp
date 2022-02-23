@@ -8,7 +8,7 @@
 
 using namespace std;
 
-
+//Found these as a way to genreate random numbers safely
 static random_device rd;
 static mt19937 mt(rd());
 static uniform_int_distribution<unsigned int> dist;
@@ -21,7 +21,7 @@ int add(int a, int b){ return a + b;}
 int sub(int a, int b){ return a - b;}
 float div(float a, float b){ return a / b;}
 float mul(float a, float b){ return a*b;}
-float log(int a, int base){ return div(log2(a), log2(base));}
+float log( int base, int a){ return div(log2(a), log2(base));}
 float trig(int binCosSinTan, float trigParam){
     x *= (180/M_PI);
     switch(binCosSinTan){
@@ -79,14 +79,13 @@ bool addition(){
     }
     choice2:
     cout << "Beginning Training...\n";
-    int a, b;
-    bool cont = true;
-    while(cont){
+    int a, b, answer = 1;
+    while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " + " << b << endl;
-        checker(add(a, b), cin)
+        cin >> answer;
+        checker(add(a, b), answer)
     }
-
 }
 bool subtraction(){
     cout << "Welcome to the Subtraction Module\n"
@@ -117,12 +116,12 @@ bool subtraction(){
     }
     choice2:
     cout << "Beginning Training...\n";
-    int a, b;
-    bool cont = true;
-    while(cont){
+    int a, b, answer = 1;
+    while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " - " << b << endl;
-        checker(sub(a, b), cin)
+        cin >> answer;
+        checker(sub(a, b), answer)
     }
 }
 bool division(){
@@ -154,12 +153,13 @@ bool division(){
     }
     choice2:
     cout << "Beginning Training...\n";
-    int a, b;
-    bool cont = true;
-    while(cont){
+
+    int a, b, answer = 1;
+    while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " / " << b << endl;
-        checker(div(a, b), cin)
+        cin >> answer
+        checker(div(a, b), answer)
     }
 }
 bool multiplication(){
@@ -191,12 +191,12 @@ bool multiplication(){
     }
     choice2:
     cout << "Beginning Training...\n";
-    int a, b;
-    bool cont = true;
-    while(cont){
+    int a, b, answer = 1;
+    while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " * " << b << endl;
-        checker(mul(a, b), cin)
+        cin >> answer;
+        checker(mul(a, b), answer)
     }
 }
 bool logarithm(){
@@ -228,12 +228,12 @@ bool logarithm(){
     }
     choice2:
     cout << "Beginning Training...\n";
-    int a, b;
-    bool cont = true;
-    while(cont){
+    int a, b, answer = 1;
+    while(answer){
         a = dist(mt), b = dist(mt);
         cout << "Log base " << b << "(" << a << ")" << endl;
-        checker(log(a, b), cin)
+        cin >> answer;
+        checker(log(b, a), answer)
     }
 }
 bool powers(){
@@ -265,15 +265,51 @@ bool powers(){
     }
     choice2:
     cout << "Beginning Training...\n";
-    int a, b;
-    bool cont = true;
-    while(cont){
+    int a, b, answer = 1;
+    while(answer){
         a = dist(mt), b = dist(mt);
         cout << a << " + " << b << endl;
+        cin >> answer
+        checker(power(a, b), answer)
+    }
+}
+bool trigonometry(){
+    cout << "Welcome to the Trigonometry Module\n"
+         << "What are we training today?\n"
+         << "1. Two-Digit #'s\n2. Three-Digit #'s\n3. Four-Digit #'s\n 4. Back"
+         << "Enter the number of your choice:\n";
+
+    choice:
+    char choice;
+    cin >> choice;
+    switch(choice){
+        case '1': // 2
+            dist = uniform_int_distribution<unsigned int>(10,99); //setup distribution
+            break;
+        case '2': // 3
+            dist = uniform_int_distribution<unsigned int>(100,999);
+            break;
+
+        case '3': // 4
+            dist = uniform_int_distribution<unsigned int>(1000,9999);
+            break;
+        case '4':
+            return false;
+            break;
+        default:
+            cout << "Sorry I didnt understand that."
+            goto choice;
+    }
+    choice2:
+    cout << "Beginning Training...\n";
+    int a, b, answer = 1;
+    while(answer){
+        a = dist(mt), b = dist(mt);
+        cout << a << " + " << b << endl;
+        cin >> answer
         checker(add(a, b), cin)
     }
 }
-bool trigonometry(){}
 
 
 

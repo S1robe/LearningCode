@@ -8,7 +8,7 @@ goto Main
 call login
 ::Checks the Login info, hands off to lockdown.bat if not valid entry
 :login
-echo "To access this drive you must provide your Name and issued password from Kira"
+echo "To access self drive you must provide your Name and issued password from Kira"
 set /p "user=User:"
 call :checkUser %user%
 set /p "pass=Password:"

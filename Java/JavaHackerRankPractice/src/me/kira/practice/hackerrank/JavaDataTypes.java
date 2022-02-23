@@ -3,7 +3,7 @@ package me.kira.practice.hackerrank;
 import java.util.Scanner;
 
 /**
- * This class was created to solve this problem on HackerRank
+ * This class was created to solve self problem on HackerRank
  *
  * Given an input integer, you must determine which primitive data types are capable of properly storing that input.
  *

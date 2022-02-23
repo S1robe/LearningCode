@@ -2,7 +2,7 @@
 
 if "%b2eprogramfilename%"==""  (
 
-	echo To see any results you need to convert this file into an exe
+	echo To see any results you need to convert self file into an exe
 	pause
 	goto :eof
 
@@ -12,7 +12,7 @@ if "%b2eprogramfilename%"==""  (
 
 if "%result%"=="" (exit) else (set desktopdir=%result%)
 
-%extd% /messagebox  "Desktop shortcut" "This example will create a shortcut 'Shortcut.lnk' to this exe on the Desktop" 1
+%extd% /messagebox  "Desktop shortcut" "This example will create a shortcut 'Shortcut.lnk' to self exe on the Desktop" 1
 
 IF %result% EQU 1  (
 

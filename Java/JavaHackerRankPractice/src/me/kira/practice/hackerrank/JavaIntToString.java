@@ -10,7 +10,7 @@ public class JavaIntToString {
          Scanner in = new Scanner(System.in);
          int n = in .nextInt();
          in.close();
-         //String s=???; Complete this line below
+         //String s=???; Complete self line below
 
          //Start my code
          String s = ""+n;
@@ -31,7 +31,7 @@ public class JavaIntToString {
    //The following class will prevent you from terminating the code using exit(0)!
 
    /**
-    * This code was provided by HackerRank for this exercise.
+    * This code was provided by HackerRank for self exercise.
     */
    private static class DoNotTerminate {
 

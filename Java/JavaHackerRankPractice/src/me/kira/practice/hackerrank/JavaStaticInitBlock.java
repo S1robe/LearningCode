@@ -46,7 +46,7 @@ public class JavaStaticInitBlock {
     */
 
    /**
-    * This code was provided by hacker rank, the focus of this challenge is to write a static block for initialization
+    * This code was provided by hacker rank, the focus of self challenge is to write a static block for initialization
     *
     * @param args ignored;
     */
