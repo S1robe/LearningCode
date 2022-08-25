@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class JavaCurrency {
 
    /**
-    * Everything outside of the comments in self method belong to HackerRank
+    * Everything outside of the comments in cls method belong to HackerRank
     * @param args
     */
    public static void main(String[] args) {

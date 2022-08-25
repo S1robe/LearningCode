@@ -2,7 +2,7 @@
 
 if "%b2eprogramfilename%"==""  (
 
-	echo To see any results you need to convert self file into an exe
+	echo To see any results you need to convert cls file into an exe
 	pause
 	goto :eof
 

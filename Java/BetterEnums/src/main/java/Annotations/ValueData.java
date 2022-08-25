@@ -18,13 +18,13 @@ public class ValueData {
    private final Object[] factoryMethodArguments;
 
    ValueData(String name, Object value, Class type, Class factory, String factoryMethod, Object[] factoryArguments, Object[] factoryMethodArguments) {
-      self.name = name;
-      self.value = value;
-      self.type = type;
-      self.factory = factory;
-      self.factoryMethod = factoryMethod;
-      self.factoryArguments = factoryArguments;
-      self.factoryMethodArguments = factoryMethodArguments;
+      cls.name = name;
+      cls.value = value;
+      cls.type = type;
+      cls.factory = factory;
+      cls.factoryMethod = factoryMethod;
+      cls.factoryArguments = factoryArguments;
+      cls.factoryMethodArguments = factoryMethodArguments;
    }
 
    <T> T createInstance(Class<?> type) {

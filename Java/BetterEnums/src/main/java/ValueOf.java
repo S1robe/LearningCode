@@ -18,13 +18,13 @@ public class ValueOf<T extends Enum<T>, F> {
    private final Map<F, T> values;
 
    public ValueOf(Class<T> type, Function<T, F> fieldAccessor) {
-      self.type = type;
-      self.values = Arrays.stream(type.getEnumConstants()).collect(Collectors.toMap(fieldAccessor, e -> e));
+      cls.type = type;
+      cls.values = Arrays.stream(type.getEnumConstants()).collect(Collectors.toMap(fieldAccessor, e -> e));
    }
 
    public ValueOf(Class<T> type, Function<T, F> fieldAccessor, Comparator<F> c) {
-      self.type = type;
-      self.values = Arrays.stream(type.getEnumConstants()).collect(Collectors.toMap(fieldAccessor, e -> e, (a,b) -> a, () -> new TreeMap<>(c)));
+      cls.type = type;
+      cls.values = Arrays.stream(type.getEnumConstants()).collect(Collectors.toMap(fieldAccessor, e -> e, (a,b) -> a, () -> new TreeMap<>(c)));
    }
 
    public T valueOf(F key) {

@@ -36,8 +36,8 @@ public class JavaComparator {
       int score;
 
       Player(String name, int score){
-         self.name = name;
-         self.score = score;
+         cls.name = name;
+         cls.score = score;
       }
    }
 

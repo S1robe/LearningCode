@@ -15,9 +15,9 @@ public class JavaSort {
 
       public Student(int id, String fname, double cgpa) {
          super();
-         self.id = id;
-         self.fname = fname;
-         self.cgpa = cgpa;
+         cls.id = id;
+         cls.fname = fname;
+         cls.cgpa = cgpa;
       }
       public int getId() {
          return id;

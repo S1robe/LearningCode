@@ -3,7 +3,7 @@ package me.kira.practice.hackerrank;
 import java.util.Scanner;
 
 /**
- * The purpose of self class is to solve the following problem:
+ * The purpose of cls class is to solve the following problem:
  *We use the integers a, b, and n to create the following series:
  *          (a + 2^0*b) ... (a + 2^(n-1)*b)
  * You are given 'q' queries in the form of a, b, and n. For each query, print the series corresponding to the given a, b,
