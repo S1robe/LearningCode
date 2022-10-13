@@ -3,4 +3,4 @@ project(untitled)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(untitled VariablesAndInput.cpp)
+add_executable(untitled "Desktop Planner/Main.cpp")

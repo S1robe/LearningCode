@@ -1,0 +1,21 @@
+body {
+    background-color: darkslateblue;
+}
+h1 {
+    color: chocolate;
+}
+div {
+    text-align: center;
+    color: orange;
+    border: 20px chocolate;
+    padding: 10px;
+    font-size: xxx-large;
+}
+button {
+    background-color: #4CAF50; /* Green */
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
