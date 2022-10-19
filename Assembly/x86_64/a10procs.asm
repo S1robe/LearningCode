@@ -23,6 +23,7 @@
 ; size = 100-2000
 %macro ASCIISept2Int 3
 mov rax, 0
+mov r9, 0
 mov r8, 7
 %%loop:
 	mov r9b, byte[%1]
@@ -42,6 +43,8 @@ mov r8, 7
 
 
 %%fail:
+	pop r8
+	pop rdx
 	cmp %3, 1;
 	je %%failValueSpd
 	cmp %3, 2 ;clr
@@ -64,130 +67,130 @@ mov r8, 7
 %endmacro
 
 ; Calc x1,y1
-%macro calcX1Y1 0
+%macro calcX1Y1 1
 	movsd xmm0, qword[t]
 	call cos
 	movsd qword[x], xmm0
 	movsd xmm0, qword[t]
 	call sin
 	movsd qword[y], xmm0
-%endMacro
+%endmacro
 
 ; Calc x2,y2
-%macro calcX2Y2 0
-	movssd xmm2, qword[fltTwo]	;store 2
-	movssd xmm3, qword[fltThree]  ;store 3
+%macro calcX2Y2 1
+	movsd xmm2, qword[fltTwo]	;store 2
+	movsd xmm3, qword[fltThree]  ;store 3
 
-	movssd xmm0, qword[x]
-	divssd xmm0, xmm3 	; cos/3, x and y are already calculated at this step
-	movssd qword[x], xmm0
+	movsd xmm0, qword[x]
+	divsd xmm0, xmm3 	; cos/3, x and y are already calculated at this step
+	movsd qword[x], xmm0
 
-	movssd xmm0, qword[y]
-	divssd xmm0, xmm3 	; sin/3, x and y are already calculated at this step
-	movssd qword[y], xmm0
+	movsd xmm0, qword[y]
+	divsd xmm0, xmm3 	; sin/3, x and y are already calculated at this step
+	movsd qword[y], xmm0
 
-	movssd xmm0, qword[s]
-	mulssd xmm0, qword[fltTwo]
-	mulssd xmm0, qword[pi]
+	movsd xmm0, qword[s]
+	mulsd xmm0, qword[fltTwo]
+	mulsd xmm0, qword[pi]
 
-	movssd qword[flt2S2piSOv3], xmm0	; hold 2Pis
+	movsd qword[flt2S2piSOv3], xmm0	; hold 2Pis
 	call cos
-	mulssd xmm0, qword[fltTwo]			; 2cos(pis)
-	divssd xmm0, qword[fltThree]		; /3
-	movssd qword[flt2C2piSOv3], xmm0	; stored 2cos(2pis)
-	movssd xmm1, qword[x]
+	mulsd xmm0, qword[fltTwo]			; 2cos(pis)
+	divsd xmm0, qword[fltThree]		; /3
+	movsd qword[flt2C2piSOv3], xmm0	; stored 2cos(2pis)
+	movsd xmm1, qword[x]
 	addsd  xmm0, xmm1				    ; x = cos(t)/3 + 2cos(2pis)/3
-	movssd qword[x], xmm0
+	movsd qword[x], xmm0
 
-	movssd xmm0, qword[flt2S2piSOv3]	; restore 2piS
+	movsd xmm0, qword[flt2S2piSOv3]	; restore 2piS
 	call sin
-	mulssd xmm0, qword[fltTwo]			; 2sin(pis)
-	divssd xmm0, qword[fltThree]		; /3
-	movssd qword[flt2S2piSOv3], xmm0	; stored 2sin(2pis)
-	movssd xmm1, qword[y]
+	mulsd xmm0, qword[fltTwo]			; 2sin(pis)
+	divsd xmm0, qword[fltThree]		; /3
+	movsd qword[flt2S2piSOv3], xmm0	; stored 2sin(2pis)
+	movsd xmm1, qword[y]
 	addsd  xmm0, xmm1				    ; y = sin(t)/3 + 2sin(2pis)/3
-	movssd qword[y], xmm0
-%endMacro
+	movsd qword[y], xmm0
+%endmacro
 
 ; Calc x3,y3
-%macro calcX3Y3 0
-	movssd xmm0, qword[flt2C2piSOv3] 	; load 2cos(2pis)/3
-	movssd qword[x], xmm0
-	movssd xmm0, qword[flt2S2piSOv3] 	; load 2sin(2pis)/3
-	movssd qword[y], xmm0
+%macro calcX3Y3 1
+	movsd xmm0, qword[flt2C2piSOv3] 	; load 2cos(2pis)/3
+	movsd qword[x], xmm0
+	movsd xmm0, qword[flt2S2piSOv3] 	; load 2sin(2pis)/3
+	movsd qword[y], xmm0
 
-	movssd xmm0, qword[fltFourPiS]
-	mulssd xmm0, qword[s]				; construct 4pis
-	movssd xmm1, xmm0
+	movsd xmm0, qword[fltFourPiS]
+	mulsd xmm0, qword[s]				; construct 4pis
+	movsd xmm1, xmm0
 	call cos
-	mulssd xmm0, qword[t]
+	mulsd xmm0, qword[t]
 	divsd xmm0, qword[fltSixPi]			; tcos(4pis)/6pi
-	movssd xmm1, qword[x]
+	movsd xmm1, qword[x]
 	addsd  xmm0, xmm1				    ; 2cos(2pis) + ^
-	movssd qword[x], xmm0
+	movsd qword[x], xmm0
 
-	movssd xmm0, xmm1					; restore 4pis
+	movsd xmm0, xmm1					; restore 4pis
 	call sin
-	mulssd xmm0, qword[t]
+	mulsd xmm0, qword[t]
 	divsd xmm0, qword[fltSixPi]			; tsin(4pis)/6pi
-	movssd xmm1, qword[y]
+	movsd xmm1, qword[y]
 	subsd  xmm1, xmm0				    ; 2sin(2pis) + ^
-	movssd qword[y], xmm1
-%endMacro
+	movsd qword[y], xmm1
+%endmacro
 
 ; Calc x4,x4
-%macro calcX4Y4 0
-	movssd xmm0, qword[flt2C2piSOv3] 	; load 2cos(2pis)/3
-	movssd qword[x], xmm0
-	movssd xmm0, qword[flt2S2piSOv3] 	; load 2sin(2pis)/3
-	movssd qword[y], xmm0
+%macro calcX4Y4 1
+	movsd xmm0, qword[flt2C2piSOv3] 	; load 2cos(2pis)/3
+	movsd qword[x], xmm0
+	movsd xmm0, qword[flt2S2piSOv3] 	; load 2sin(2pis)/3
+	movsd qword[y], xmm0
 
-	movssd xmm0, qword[fltFourPiS]
+	movsd xmm0, qword[fltFourPiS]
 	addsd xmm0, qword[fltTwoPiOv3]		; 4pis+2pi/3
 
-	movssd xmm1, xmm0
+	movsd xmm1, xmm0
 	call cos
-	mulssd xmm0, qword[t]
+	mulsd xmm0, qword[t]
 	divsd xmm0, qword[fltSixPi]			; tcos(4pis)/6pi
-	movssd xmm2, qword[x]
+	movsd xmm2, qword[x]
 	addsd  xmm2, xmm0				    ; 2cos(2pis) + ^
-	movssd qword[x], xmm2
+	movsd qword[x], xmm2
 
-	movssd xmm0, xmm1					; restore 4pis + 2pi/3
+	movsd xmm0, xmm1					; restore 4pis + 2pi/3
 	call sin
-	mulssd xmm0, qword[t]
+	mulsd xmm0, qword[t]
 	divsd xmm0, qword[fltSixPi]			; tsin(4pis)/6pi
-	movssd xmm2, qword[y]
+	movsd xmm2, qword[y]
 	subsd  xmm2, xmm0				    ; 2sin(2pis)/3 - ^
-	movssd qword[y], xmm2
-%endMacro
+	movsd qword[y], xmm2
+%endmacro
 
 ; Calc x5,y5
-%macro calcX5Y5 0
-	movssd xmm0, qword[flt2C2piSOv3] 	; load 2cos(2pis)/3
-	movssd qword[x], xmm0
-	movssd xmm0, qword[flt2S2piSOv3] 	; load 2sin(2pis)/3
-	movssd qword[y], xmm0
+%macro calcX5Y5 1
+	movsd xmm0, qword[flt2C2piSOv3] 	; load 2cos(2pis)/3
+	movsd qword[x], xmm0
+	movsd xmm0, qword[flt2S2piSOv3] 	; load 2sin(2pis)/3
+	movsd qword[y], xmm0
 
-	movssd xmm0, qword[fltFourPiS]
+	movsd xmm0, qword[fltFourPiS]
 	subsd xmm0, qword[fltTwoPiOv3]		; 4pis-2pi/3
 
-	movssd xmm1, xmm0
+	movsd xmm1, xmm0
 	call cos
-	mulssd xmm0, qword[t]
+	mulsd xmm0, qword[t]
 	divsd xmm0, qword[fltSixPi]			; tcos(4pis)/6pi
-	movssd xmm2, qword[x]
+	movsd xmm2, qword[x]
 	addsd  xmm2, xmm0				    ; 2cos(2pis) + ^
-	movssd qword[x], xmm2
+	movsd qword[x], xmm2
 
-	movssd xmm0, xmm1					; restore 4pis - 2pi/3
+	movsd xmm0, xmm1					; restore 4pis - 2pi/3
 	call sin
-	mulssd xmm0, qword[t]
+	mulsd xmm0, qword[t]
 	divsd xmm0, qword[fltSixPi]			; tsin(4pis)/6pi
-	movssd xmm2, qword[y]
+	movsd xmm2, qword[y]
 	subsd  xmm2, xmm0				    ; 2sin(2pis)/3 - ^
-	movssd qword[y], xmm2
-%endMacro
+	movsd qword[y], xmm2
+%endmacro
 
 
 ; ---------------------------------------------------------
@@ -357,31 +360,28 @@ je fail
 mov rax, errBadCL
 cmp rdi, 7
 jne fail
-	
-lea r9, [rsi + (rdi)*8]	; give r9 the final address so we can use rsi as a an index
-add rsi, 8				; skip first address, its the name of the program, unecessary 
+
 mov rdi, 1				; this will count argument pairs
 chompInput:
-	cmp rsi, r9			; if these are equal, then we are done because r9 is outside the arg array
+	cmp rdi, 4			; if these are equal, then we are done, because there is no 4th pair of args.
 	je dneChomp
-	mov r10, rsi
-	add r10, 8
-	push r9
+	add rsi, 8
+	mov r10, qword[rsi]
 	; Start inline macro
 
 	;%%chompSpec:
-	cmp byte[rsi], '-' 	; has to be present
+	cmp byte[r10], '-' 	; has to be present
 	jne failNoTac
-	inc rsi
+	inc r10
 
-	cmp byte[rsi], 's'	; could be sp or sz
+	cmp byte[r10], 's'	; could be sp or sz
 	je checkSpSz
 
-	cmp byte[rsi], 'c'
+	cmp byte[r10], 'c'
 	jne fail
-	inc rsi
+	inc r10
 
-	cmp byte[rsi], 'l'
+	cmp byte[r10], 'l'
 	jne fail
 
 	; valid -cl
@@ -391,8 +391,8 @@ chompInput:
 	jmp validate
 
 	checkSpSz:
-		inc rsi
-		cmp byte[rsi], 'p'
+		inc r10
+		cmp byte[r10], 'p'
 		jne checkZ
 
 		; valid -sp
@@ -402,7 +402,7 @@ chompInput:
 		jmp validate
 
 		checkZ:
-		cmp byte[rsi], 'z'
+		cmp byte[r10], 'z'
 		jne fail
 
 		; valid -sz
@@ -430,10 +430,12 @@ chompInput:
 			jmp fail
 
 	validate:
-		inc rsi
-		cmp byte[rsi], 0	; this should be a null if its not then its invalid
+		inc r10
+		cmp byte[r10], 0	; this should be a null if its not then its invalid
 		jne failNoTac
 
+	add rsi, 8
+	mov r10, qword[rsi]
 	chompVal:
 		cmp rdi, 1	; handling spd
 		je chompSpd
@@ -442,39 +444,62 @@ chompInput:
 		je chompClr
 
 		;chompSiz
-			mov rax, errSizValue
+			push rdx
+			push r8
 			ASCIISept2Int r10, r11d, rdi
+			pop r8
+			pop rdx
 			cmp r11d, SIZ_MAX
 			jg fail
 			cmp r11d, SIZ_MIN
 			jl fail
-			pop r9
-			mov dword[size], r11d
+			mov dword[r8], r11d
+			
+			inc rdi
 			jmp chompInput
 
 		chompSpd:
+			push rdx
+			push r8
 			ASCIISept2Int r10, r11d, rdi
+			pop r8
+			pop rdx
 			cmp r11d, SPD_MAX
 			jg fail
 			cmp r11d, SPD_MIN
 			jl fail
-			pop r9
-			mov dword[speed], r11d
+			mov dword[rcx], r11d
+			
+			inc rdi
 			jmp chompInput
 
 		chompClr:
+			push rdx
+			push r8
 			ASCIISept2Int r10, r11d, rdi
+			pop r8
+			pop rdx
 			cmp r11d, CLR_MAX
 			jg fail
 			cmp r11d, CLR_MIN
 			jl fail
-			pop r9
-			mov dword[color], r11d
+			mov dword[rdx], r11d
+			and r11, 0x00000000000000FF
+			mov dword[blue], r11d
+			mov r11d, dword[rdx]
+			shl r11d, 8
+			mov dword[green], r11d
+			mov r11d, dword[rdx]
+			shl r11d, 16
+			mov dword[red], r11d
+			
+			inc rdi
 			jmp chompInput
 ; end inline macro
 dneChomp:
 	
-	
+	call drawWheels
+	ret
 	
 	
 fail:
@@ -512,11 +537,11 @@ drawWheels:
 ; pre-Calc values of pi and store them
 ; 2pi, 4pi, 6pi, 2pi/3
 movsd xmm0, qword[pi]
-mulssd qword[fltFourPiS], xmm0 ; calc & store 4pi
-mulssd qword[fltSixPiS], xmm0 ; calc & store 6pi
-mulssd xmm0, qword[fltTwo]
-divssd xmm0, qword[fltThree]; calc & store 2pi/3
-movssd qword[fltTwoPiOv3], xmm0
+mulsd xmm0, qword[fltFourPiS]; calc & store 4pi
+mulsd xmm0, qword[fltSixPi]; calc & store 6pi
+mulsd xmm0, qword[fltTwo]
+divsd xmm0, qword[fltThree]; calc & store 2pi/3
+movsd qword[fltTwoPiOv3], xmm0
 ; -----
 ;  Set draw speed step
 ;	sStep = speed / scale
@@ -541,8 +566,10 @@ movsd qword[sStep], xmm0
 ;	uses glColor3ub(r,g,b)
 
 ;	YOUR CODE GOES HERE
-
-
+mov edi, dword[red]
+mov esi, dword[blue]
+mov ecx, dword[green]
+call glColor3ub
 
 ; -----
 ;  main plot loop
@@ -552,7 +579,33 @@ movsd qword[sStep], xmm0
 
 ;	YOUR CODE GOES HERE
 
+	movsd xmm3, qword[pi]
+	mulsd xmm3, qword[fltTwo]
 drawingLoop:
+	movsd xmm2, qword[t]
+	
+	ucomisd xmm2, xmm3
+	ja end
+	
+	
+	movsd xmm0, qword[x]
+	movsd xmm1, qword[y]
+	
+	calcX1Y1 xmm0
+	call glVertex2d
+	calcX2Y2 xmm0
+	call glVertex2d
+	calcX3Y3 xmm0
+	call glVertex2d
+	calcX4Y4 xmm0
+	call glVertex2d
+	calcX5Y5 xmm0
+	call glVertex2d
+	
+	addsd xmm2, qword[tStep]
+	movsd qword[t], xmm2
+	jmp drawingLoop
+end:
 
 ; -----
 ;  Display image
@@ -634,4 +687,5 @@ prtDone:
 	ret
 
 ; ******************************************************************
+
 
