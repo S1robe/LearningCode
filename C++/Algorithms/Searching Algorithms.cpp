@@ -51,13 +51,13 @@ int doRegularSearchesMain(){
  * then we will simply take the max of the surrounding values.
  *
  * @param A String A
- * @param B String B
+ * @param X String X
  * @param m length of A
- * @param n length of B
+ * @param n length of X
  * @return
  */
-int LongestCommonSubSeq(char A[], char B[], int m, int n){
-    //I will run A down m, and B down N, where A is length M and B length N
+int LongestCommonSubSeq(char A[], char X[], int m, int n){
+    //I will run A down m, and X down N, where A is length M and X length N
     int dp[m+1][n+1];
     /**
      * Created the 2D array: where the numbers represent the size of the substring we are looking at
@@ -78,7 +78,7 @@ int LongestCommonSubSeq(char A[], char B[], int m, int n){
         for(int j = 0; j <= n; j++){
             if(i == 0 || j == 0)
                 dp[i][j] = 0;
-            else if(A[i-1] == B[j-1])
+            else if(A[i-1] == X[j-1])
                 dp[i][j] = dp[i-1][j-1] + 1;
             else dp[i][j] = std::max(dp[i][j-1], dp[i-1][j]);
 
@@ -92,14 +92,43 @@ int LongestCommonSubSeq(char A[], char B[], int m, int n){
 /*
  * Yay Main
  */
+//int main(){
+//    char * A, * X;
+//    std::cout << "Enter String A: ";
+//    std::cin >> A;
+//    std::cout << "Enter String X: ";
+//    std::cin >> X;
+//    std::cout << LongestCommonSubSeq(A, X, ((int)sizeof(*A)/sizeof(char)), ((int)sizeof(*X)/sizeof(char)));
+//
+//}
+int const N = 1000;
+int X[N];
+int back[N];
+int C[N];
+void writelistofcoins(int k){
+    if(k >= 2) {
+        writelistofcoins(back[k]);
+        cout << ",";
+    }
+    cout << k;
+}
 int main(){
-    char * A, * B;
-    std::cout << "Enter String A: ";
-    std::cin >> A;
-    std::cout << "Enter String B: ";
-    std::cin >> B;
-    std::cout << LongestCommonSubSeq(A, B, ((int)sizeof(*A)/sizeof(char)), ((int)sizeof(*B)/sizeof(char)));
-
+    C[0] = X[0];
+    C[1] = X[1];
+    C[2] = X[0]+X[2];
+    back[2] = 0;
+    for(int i = 3; i < N; i++)
+        if (C[i-3] > C[i-2]){
+            back[i] = i-3;
+            C[i] = C[i-3]+X[i];
+        }
+        else{
+            back[i] = i-2;
+            C[i] = C[i-2]+X[i];
+        }
+    if(C[N-2] > C[N-1]) writelistofcoins(N-2);
+    else writelistofcoins(N-1);
+    return3 1;
 }
 
 
