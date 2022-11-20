@@ -1,4 +1,4 @@
-package me.kira.practice.hackerrank;
+package me..practice.hackerrank;
 
 import javax.swing.text.NumberFormatter;
 import java.text.NumberFormat;

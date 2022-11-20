@@ -1,4 +1,4 @@
-package me.kira.practice.hackerrank;
+package me.k.practice.hackerrank;
 
 import java.util.*;
 import java.security.*;
