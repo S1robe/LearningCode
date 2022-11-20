@@ -1,0 +1,64 @@
+################------------LOCKED-------------################
+
+-------------------
+Timed Test (1 thread)
+
+real	0m18.692s
+user	0m18.677s
+sys	0m0.008s
+
+-------------------
+Timed Test (2 thread)
+
+real	0m10.895s
+user	0m21.757s
+sys	0m0.008s
+
+-------------------
+Timed Test (3 thread)
+
+real	0m8.111s
+user	0m24.289s
+sys	0m0.000s
+
+-------------------
+Timed Test (4 thread)
+
+real	0m5.973s
+user	0m23.827s
+sys	0m0.012s
+
+
+
+
+################------------UNLOCKED-------------################
+
+-------------------
+Timed Test (1 thread)
+
+real	0m18.324s
+user	0m18.319s
+sys	0m0.004s
+
+-------------------
+Timed Test (2 thread)
+
+real	0m10.944s
+user	0m21.846s
+sys	0m0.016s
+
+-------------------
+Timed Test (3 thread)
+
+real	0m7.957s
+user	0m23.819s
+sys	0m0.012s
+
+-------------------
+Timed Test (4 thread)
+
+real	0m6.002s
+user	0m23.958s
+sys	0m0.000s
+
+

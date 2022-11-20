@@ -1,0 +1,29 @@
+; *****************************************************************
+;  Assignment: 11
+;  Description: This writeup details the performance benefits of performing buffered I/O. It uses the linux-builtin 'time' to compare two identical downsampling programs with the one exception being the buffer size in one is one pixel rather than a few 100k pixels.
+
+
+*****************************************************************
+
+Machine Description:
+--------------------
+Workstation desktop running Manjaro linux 6.0.2.2, with 6 core 12 thread 4.9Ghz processor, 1tb ssd, and 64 GB of dd4-3200 ram.
+
+Timing:
+-------
+Large Buffer
+Average Real Time: 0.323s
+
+Small Buffer
+Average Real Time: 13.864s
+
+
+Percentage Change: 4192.26006192
+
+Explanation:
+------------
+The buffer directly impacts performance when handling the input and output of data: a large buffer increases the performace of the program. It reduces the number of syscall's operations for reading from a file, thus allowing the program to churn through a larger chunk of data before having to request a read from the system again. This is because making a read request requires that the call frame or activation record be built and then actually calling to the system which then halts program operation untill the OS can give control back to the program.
+
+
+
+
