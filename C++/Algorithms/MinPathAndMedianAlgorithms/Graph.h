@@ -2,25 +2,34 @@
 // Created by owner on 10/23/22.
 //
 
-#ifndef MINPATHANDMEDIANALGORITHMS_GRAPH_H
-#define MINPATHANDMEDIANALGORITHMS_GRAPH_H
+#include "map"
+#include "Vertice.h"
+#include <cstddef>
 
-#include <utility>
-#include <list>
-
-typedef std::pair<int, int> wPair;
-
-class Graph {
-    int v; // # of vertices
-    std::list<wPair> * adjacent;
-
+class Graph : std::map<int, Vertice>{
 public:
-    // Generate graph with v vertices
-    explicit Graph(int v);
-    void addEdge(int u, int v, int weight);
-    int getWeight(int u, int v);
-    int size();
+  explicit Graph() = default;
+  void addEdge(int u, int v, int toV);
+  void addDoubleEdge(int u, int v, int toV, int toU);
+  void getWeightFrom(int u, int v);
+  std::map<int, int> edgesOf(int u); 
 };
 
 
-#endif //MINPATHANDMEDIANALGORITHMS_GRAPH_H
+
+
+void Graph::addEdge(int u, int v, int toV){
+   Vertice i = this->at(u);
+  
+     
+
+}
+
+
+
+void Graph::addDoubleEdge(int u, int v, int toV, int toU){
+   auto i = Vertice(u);
+   auto j = Vertice(v);
+
+}
+
