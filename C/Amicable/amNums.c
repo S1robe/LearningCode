@@ -1,9 +1,9 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "math.h"
 #include "string.h"
 #include <limits.h>
+#include <math.h>
 
 /*
 struct {
@@ -20,6 +20,7 @@ unsigned long limit = 0;
 int amiNums = 0;
 int idx = 0;
 int idxLimit = 0;
+
 
 /**
  * Handles summing proper divisor for threads.
@@ -42,7 +43,7 @@ int sumPropDiv(int num){
 
 //Thread function
 void* amicable(void* arg){
-  printf("\nThread # %d: Roger Roger\n\n", (*(int*)arg)); // lol
+  //printf("\nThread # %d: Roger Roger\n\n", (*(int*)arg)); // lol
 
   int myNum = 0;
 
@@ -192,7 +193,7 @@ int main(int argc, char ** argv){
 
   amiNums = (amiNums+1)/2; // fix from index and divide to become pairs
 
-  printf("\nCount of amicable number pairs from 1 to %s is %d", argv[4],  amiNums );
+  printf("\nCount of amicable number pairs from 1 to %s is %d\n", argv[4],  amiNums );
 }
 
 
