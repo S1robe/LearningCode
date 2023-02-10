@@ -1,0 +1,45 @@
+#!/bin/bash
+
+mkdir ./AmicableTests
+cp ./amiNums.c ./AmicableTests
+cp ./makefile ./AmicableTests
+
+make -s -C ./AmicableTests
+
+echo "Various test will be performed, all results will be in amtimes.t, in ./AmicableTests\n"
+
+for i in {1..4}
+do
+    tee -a "; Results of '$i' Threads @ 1M numbers ----\n" amtimes.t
+    {time ./amNums -t $i -l 1000000 > /dev/null 2>&1;} 2> amtimes.t
+    tee -a "\n" amtimes.t
+done
+
+echo "Removing pthreads_mutex_(un)lock(s) from the program and recompiling in ./AmicableTests\n"
+
+sed 's/\(\(.*\) pthread_mutex\(.*\)\)/\/\/\1/g' amNums.c > amNums2.c
+mv amNums.c amNums.bac
+mv amNums2.c amNums.c
+make -s -C ./AmicableTests
+
+for i in {1..4}
+do
+    tee -a "; Results of !NO-MUTEX! '$i' Threads @ 1M numbers ----\n" amtimes.t
+    {time ./amNums -t $i -l 1000000 > /dev/null 2>&1;} 2> amtimes.t
+    tee -a "\n" amtimes.t
+done
+
+echo "Restoring pthread_mutex_(un)lock(s) to the program and recompiling in ./AmicableTests\n"
+
+mv amNums.bac amNums.c
+make -s -C ./AmicableTests
+
+for i in {1..4}
+do
+    tee -a "; Results of run '$i'; 64 Threads @ 1M numbers ----\m" amtimes.t
+    {time ./amNums -t 64 -l 1000000 > /dev/null 2>&1;} 2> amtimes.t
+    tee -a "\n" amtimes.t
+done
+
+
+
