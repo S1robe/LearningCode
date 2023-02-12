@@ -8,7 +8,7 @@ cp ./amNums.c $_TEST_DIR
 cp ./makefile $_TEST_DIR
 rm amtimes.t
 make -s -C $_TEST_DIR
-_TESTS=50
+_TESTS=1
 _TOT_NUM=1000000
 
 if [[ -n $1 ]] # if arg 1 was supplied, then
@@ -30,9 +30,9 @@ if [[ -n $2 ]] # if arg 1 was supplied, then
 fi
 
 echo -en "Various test will be performed, all results will be in amtimes.t\n"
-echo -en "If using defaults this will take around 10 minutes, please, be patient...\n\n"
+echo -en "If using defaults this will take around 2 minutes, please, be patient...\n\n"
 
-echo -en "Executing  Test-Mutex-Thrd\n\n"
+echo -en "Executing Test-Mutex-Thrd\n\n"
 
 #handle the # of threads
 for x in {1..4}
@@ -46,10 +46,24 @@ do
   # Read results from $_TEMPx , process results, sum and average results
   echo -en "$_TESTS runs @ $x thread(s) @ '$_TOT_NUM' nums\n" >> amtimes.t
   cat $_TEMP$x | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP$x > /dev/null
-  cat $_TEMP$x >> amtimes.t
   cat $_TEMP$x | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of '$x' Threaded Runs: %.4f\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
+  cat $_TEMP$x >> amtimes.t
 
 done
+
+echo -en "Executing $_TESTS Test-Thrd-64\n"
+# handle running the 50 test
+for i in $( seq 1 $_TESTS )
+  do
+   { time $_TEST_EXEC -t 64 -l $_TOT_NUM > /dev/null 2>&1 ; } 2>> $_TEMP"64"
+done
+# Read results from $_TEMPx , process results, sum and average results
+echo -en "$_TESTS runs @ 64 MUTEXED thread(s) @ $_TOT_NUM nums\n" >> amtimes.t
+
+cat $_TEMP"64" | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP"64" > /dev/null
+cat $_TEMP"64" | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of 64 Threaded Runs: %.4f\n\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
+cat $_TEMP"64" >> amtimes.t
+
 
 echo -en "Removing pthreads_mutex_(un)lock(s) from the program and recompiling in ./AmicableTests\n\n"
 
@@ -73,16 +87,9 @@ do
   # Read results from $_TEMPx , process results, sum and average results ; dump back to file
   echo -en "$_TESTS runs @ $x NON-MUTEXED thread(s) @ '$_TOT_NUM'\n" >> amtimes.t
   cat $_TEMP$x | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP$x > /dev/null
-  cat $_TEMP$x >> amtimes.t
   cat $_TEMP$x | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of '$x' NON-MUTEXED Threaded Runs: %.4f\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
+  cat $_TEMP$x >> amtimes.t
 done
-
-echo -en "Restoring pthread_mutex_(un)lock(s) to the program and recompiling in ./AmicableTests\n\n"
-
-#Restore old file and recomp
-mv $_TEST_DIR/amNums.bac $_TEST_DIR/amNums.c
-make -s -C $_TEST_DIR
-
 
 echo -en "Executing $_TESTS Test-Thrd-64\n"
 # handle running the 50 test
@@ -91,11 +98,11 @@ for i in $( seq 1 $_TESTS )
    { time $_TEST_EXEC -t 64 -l $_TOT_NUM > /dev/null 2>&1 ; } 2>> $_TEMP"64"
 done
 # Read results from $_TEMPx , process results, sum and average results
-echo -en "$_TESTS runs @ 64 MUTEXED thread(s) @ $_TOT_NUM nums\n" >> amtimes.t
+echo -en "$_TESTS runs @ 64 NON-MUTEXED thread(s) @ $_TOT_NUM nums\n" >> amtimes.t
 
 cat $_TEMP"64" | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP"64" > /dev/null
-cat $_TEMP"64" >> amtimes.t
 cat $_TEMP"64" | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of 64 Threaded Runs: %.4f\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
+cat $_TEMP"64" >> amtimes.t
 
 echo -en "Cleaning up....\n"
 
