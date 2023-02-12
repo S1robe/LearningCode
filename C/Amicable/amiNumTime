@@ -3,13 +3,43 @@ export _TEST_DIR=/tmp/tests
 export _TEST_EXEC=/tmp/tests/amNums
 export _TEMP=/tmp/thrd
 
-mkdir $_TEST_DIR
-cp ./amNums.c $_TEST_DIR
-cp ./makefile $_TEST_DIR
-rm amtimes.t
-make -s -C $_TEST_DIR
 _TESTS=1
 _TOT_NUM=1000000
+
+mkdir $_TEST_DIR 2> /dev/null
+
+echo -n "Checking for source: "
+
+if cp ./amNums.c $_TEST_DIR 2> /dev/null ;
+  then
+    echo -en "amNums.c found\nChecking for makefile: "
+    if cp ./makefile $_TEST_DIR 2> /dev/null;
+      then
+        _SRC=1
+        make -s -C $_TEST_DIR
+        echo -en "Makefile found"
+    else
+        _SRC=0
+        echo -en "Makefile not found\nChecking for executable: "
+    fi
+else
+  echo -en "amNums.c not found\nChecking for executable: "
+  _SRC=0
+fi
+
+if [[ $_SRC != 1 ]]
+  then
+    if ! cp ./amNums $_TEST_DIR 2> /dev/null;
+      then
+        echo -en "amNums not found. \n\nPlease put either amNums.c and its Makefile OR the amNums executable \nin the same place as this executable and re-run."
+        rm -rf $_TEST_DIR 2> /dev/null
+        exit 1;
+      else
+        echo -en "Executable found\n\n This script will not be able test NON-Mutexed."
+    fi
+fi
+
+rm amtimes.t 2> /dev/null
 
 if [[ -n $1 ]] # if arg 1 was supplied, then
   then
@@ -29,10 +59,14 @@ if [[ -n $2 ]] # if arg 1 was supplied, then
     fi
 fi
 
-echo -en "Various test will be performed, all results will be in amtimes.t\n"
-echo -en "If using defaults this will take around 2 minutes, please, be patient...\n\n"
+sleep 1
 
-echo -en "Executing Test-Mutex-Thrd\n\n"
+echo -e "\n\nVarious test will be performed, all results will be in amtimes.t\n"
+echo -e "If using defaults this will take around 1 minutes\n"
+
+sleep 1
+
+echo -en "Executing $_TESTS Test-Mutex-Thrd\n\n"
 
 #handle the # of threads
 for x in {1..4}
@@ -51,7 +85,7 @@ do
 
 done
 
-echo -en "Executing $_TESTS Test-Thrd-64\n"
+echo -en "Thread # 64\n"
 # handle running the 50 test
 for i in $( seq 1 $_TESTS )
   do
@@ -64,47 +98,50 @@ cat $_TEMP"64" | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TE
 cat $_TEMP"64" | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of 64 Threaded Runs: %.4f\n\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
 cat $_TEMP"64" >> amtimes.t
 
+if ! [[ $_SRC == 0 ]] ;
+  then
+      echo -en "\nRemoving pthreads_mutex_(un)lock(s) from the program and recompiling in ./AmicableTests\n"
 
-echo -en "Removing pthreads_mutex_(un)lock(s) from the program and recompiling in ./AmicableTests\n\n"
+      # This handles commenting out the pthreads
+      sed 's/\(\(.*\) pthread_mutex\(.*\)\)/\/\/\1/g' $_TEST_DIR/amNums.c > $_TEST_DIR/amNums2.c
+      mv $_TEST_DIR/amNums.c $_TEST_DIR/amNums.bac
+      mv $_TEST_DIR/amNums2.c $_TEST_DIR/amNums.c
+      #recomp
 
-# This handles commenting out the pthreads
-sed 's/\(\(.*\) pthread_mutex\(.*\)\)/\/\/\1/g' $_TEST_DIR/amNums.c > $_TEST_DIR/amNums2.c
-mv $_TEST_DIR/amNums.c $_TEST_DIR/amNums.bac
-mv $_TEST_DIR/amNums2.c $_TEST_DIR/amNums.c
-#recomp
-make -s -C $_TEST_DIR
+      make -i -s -C $_TEST_DIR
 
-echo -en "Executing $_TESTS Test-NMutex-Thrd\n"
+      echo -en "\nExecuting $_TESTS Test-NMutex-Thrd\n\n"
 
-for x in {1..4}
-do
-  echo -en "Thread # $x\n"
-  # handle running the 50 test
-  for i in $( seq 1 $_TESTS )
-    do
-     { time $_TEST_EXEC -t $x -l $_TOT_NUM > /dev/null 2>&1 ; } 2>> $_TEMP$x
-  done
-  # Read results from $_TEMPx , process results, sum and average results ; dump back to file
-  echo -en "$_TESTS runs @ $x NON-MUTEXED thread(s) @ '$_TOT_NUM'\n" >> amtimes.t
-  cat $_TEMP$x | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP$x > /dev/null
-  cat $_TEMP$x | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of '$x' NON-MUTEXED Threaded Runs: %.4f\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
-  cat $_TEMP$x >> amtimes.t
-done
+      for x in {1..4}
+      do
+        echo -en "Thread # $x\n"
+        # handle running the 50 test
+        for i in $( seq 1 $_TESTS )
+          do
+          { time $_TEST_EXEC -t $x -l $_TOT_NUM > /dev/null 2>&1 ; } 2>> $_TEMP$x
+        done
+        # Read results from $_TEMPx , process results, sum and average results ; dump back to file
+        echo -en "$_TESTS runs @ $x NON-MUTEXED thread(s) @ '$_TOT_NUM'\n" >> amtimes.t
+        cat $_TEMP$x | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP$x > /dev/null
+        cat $_TEMP$x | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of '$x' NON-MUTEXED Threaded Runs: %.4f\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
+        cat $_TEMP$x >> amtimes.t
+      done
 
-echo -en "Executing $_TESTS Test-Thrd-64\n"
-# handle running the 50 test
-for i in $( seq 1 $_TESTS )
-  do
-   { time $_TEST_EXEC -t 64 -l $_TOT_NUM > /dev/null 2>&1 ; } 2>> $_TEMP"64"
-done
-# Read results from $_TEMPx , process results, sum and average results
-echo -en "$_TESTS runs @ 64 NON-MUTEXED thread(s) @ $_TOT_NUM nums\n" >> amtimes.t
+      echo -en "Thread # 64\n"
+      # handle running the 50 test
+      for i in $( seq 1 $_TESTS )
+        do
+        { time $_TEST_EXEC -t 64 -l $_TOT_NUM > /dev/null 2>&1 ; } 2>> $_TEMP"64"
+      done
+      # Read results from $_TEMPx , process results, sum and average results
+      echo -en "$_TESTS runs @ 64 NON-MUTEXED thread(s) @ $_TOT_NUM nums\n" >> amtimes.t
 
-cat $_TEMP"64" | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP"64" > /dev/null
-cat $_TEMP"64" | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of 64 Threaded Runs: %.4f\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
-cat $_TEMP"64" >> amtimes.t
+      cat $_TEMP"64" | awk -F' ' '/real(.*)m(.*)s/{print$2}' | sed 's/s//g' | tee $_TEMP"64" > /dev/null
+      cat $_TEMP"64" | awk -F'm' '{mSum+=$1;sSum+=$2;} END{printf("\nAverage of '$_TESTS' @ '$_TOT_NUM' nums of 64 Threaded Runs: %.4f\n",(mSum*60 + sSum)/'$_TESTS');}' >> amtimes.t
+      cat $_TEMP"64" >> amtimes.t
+fi
 
-echo -en "Cleaning up....\n"
+echo -en "\nCleaning up....\n"
 
 #Cleanup
 rm $_TEMP"1"
