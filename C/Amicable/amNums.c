@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
-#include <limits.h>
 #include <math.h>
-#include <strings.h>
 
 pthread_mutex_t lock;
 
@@ -12,20 +10,20 @@ unsigned long (*arr)[2];
 
 unsigned long limit = 0;
 
-int amiNums = 0;
-int idx = 0;
-int idxLimit = 0;
+unsigned int amiNums = 0;
+unsigned int idx = 0;
+unsigned long idxLimit = 0;
 
 
 /**
  * Handles summing proper divisor for threads.
  * Returns the sum of the proper divisor of num
  */
-int sumPropDiv(int num){
+unsigned long sumPropDiv(unsigned long num){
   if(num == 1) // no divsors
     return 0;
 
-  int sum = 0;
+  unsigned long sum = 0;
   // largest proper divsor can only be as big as the sqrt of num
   for (int i = 2; i <= sqrt(num); i++)
     if ((num % i) == 0){
@@ -40,7 +38,7 @@ int sumPropDiv(int num){
 void* amicable(void* arg){
   //printf("\nThread # %d: Roger Roger\n\n", (*(int*)arg)); // lol
 
-  int myNum = 0;
+  unsigned long myNum = 0;
 
   while(1){ // just go till were out of numbers
     pthread_mutex_lock(&lock); // lock it down
@@ -55,7 +53,7 @@ void* amicable(void* arg){
 
     // If number is amicable, then it should end up back where it started after 2 calls. Duplicates will be removed in main, i Like 1 O(N log N) instead of many O(n) checks for duplicates.
 
-    int amiNum = sumPropDiv(myNum);
+    unsigned long amiNum = sumPropDiv(myNum);
     // if the potential amiNum is not within range
     // or >= to itself its already been checked!
     // dont do this!
@@ -95,7 +93,7 @@ int validate(int argc, char** argv){
     else t++;
 
 
-  unsigned int tCnt = atoi(argv[2]);
+  int tCnt = atoi(argv[2]);
   if((tCnt < 1) | (tCnt > 100)){
     printf("Error, thread count must be >= 1 and <= 100.");
     return 0;
@@ -115,14 +113,21 @@ int validate(int argc, char** argv){
     }
     else t++;
 
+  char *end;
+  // gimme size!
+  long long lim = strtol(argv[4], &end, 10); // works?
 
-  if((limit = atoi(argv[4])) < 100 ){
-    printf("Error, limit must be > 100.");
+  // parse "string" as long in base 10, leave end where we left off, shouldnt be the first thing, or not null
+  if(*end == argv[4][0] || *end != '\0' || lim > 4294967295L){ // strtol returns 0 if failure.
+    printf("Error, limit outside of range, must be < 2^32 -1");
     return 0;
   }
 
-  if(limit > INT_MAX){
-    printf("Error, limit must be < 2^64 -1");
+  limit = lim;
+
+  if(limit  < 100 ){
+    printf("Error, limit must be > 100.");
+    return 0;
   }
 
   return 1;
@@ -226,7 +231,7 @@ int main(int argc, char ** argv){
   for(int i = 0; i < tCnt; i++){
     if(pthread_create(&thrds[i], NULL, amicable, &i) != 0){
       printf("Thread %d creation failed!\n", i);
-      exit(1);
+      return 1;
     }
   }
 
@@ -244,14 +249,15 @@ int main(int argc, char ** argv){
           "Amicable Numbers");
 
   //sort
-  ms(0, amiNums);
+  ms(0, amiNums-1); // exclude the last index because that is 0, always, safety <3
 
-  for(int i = 1;  i < amiNums; i++){
+  for(int i = 0;  i < amiNums; i++){
     printf("%7lu%7lu\n", arr[i][1], arr[i][0]);
   }
 
   free(arr);
   printf("\nCount of amicable number pairs from 1 to %s is %d\n", argv[4],  amiNums );
+  return 0;
 }
 
 // need to write a sorting function that sorts upper "parallel array" and then applies result simultaneously to the mirror
