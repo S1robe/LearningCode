@@ -7,15 +7,23 @@
 #include <time.h>
 #include <string.h>
 
-struct {
-    unsigned long n;
-    int c;
-    int i;
-} args;
+int n;
+int c;
+int i;
+int p;
 
 sem_t sem;
-sigset_t sigint;
-int wait = 0;
+pthread_t * threads;
+sigset_t sigset;
+struct sigaction new, old;
+int notBoarding;
+
+void sighandle(int sig){}
+
+void wake() {
+    for (int i = 0; i < n; i++)
+        pthread_kill(threads[i], SIGUSR1);
+}
 
 void* coaster(void* arg){
     int rides = 1;
@@ -24,122 +32,145 @@ void* coaster(void* arg){
     int sval;
     time(&before);
     // while passenegers are present
-    while(args.n){
+    while(p){
+        notBoarding = 0;
+        // while the time elapsed < 2s, and all seats are not filled
         time(&current);
-                        // while the time elapsed < 2s, and all seats are not filled
-        if((difftime(current, before) >= 2) | !sem_getvalue(&sem, &sval)){
-            wait = 1;
-            int filledseats = args.c - sval; //
+        sem_getvalue(&sem, &sval);
+        if((difftime(current, before) >= 2) | (sval == 0)){
+            notBoarding = 1;
+            int filledseats = c - sval;
             // if only 1 person on the coaster
-            if(filledseats == 1)
-                printf("Car: %d passenger is", filledseats);
-            else
-                printf("Car: %d passengers are", filledseats);
-
-            printf(" riding the roller coaster. Off we go on the %d ride!\n", rides);
-            //Do coaster things
+            printf("\033[0;31m Car: %d %s riding the roller coaster. Off we go on the %d ride!\033[0m\n"
+                   , filledseats, (filledseats == 1) ? "passenger is" : "passengers are", rides);
+                //Do coaster things
             sleep(5);
-            printf("\033[0;31m Car: Ride %d completed! \033[0m\n", rides++);
-            kill(-1, SIGCONT); // ironic, but wake everybody up
+            printf("\033[0;31m Car:  ride %d  completed. \033[0m\n", rides++);
+            // wake up the kiddos
+            wake();
             time(&before); // restart timer
         }
     }
-    printf("Car: Roller coaster shutting down.\n");
+    printf("\033[0;31m Car: Roller coaster shutting down.\033[0m\n");
     pthread_exit(0);
 }
 
 void* passenger(void* arg){
-    int max_iter = (rand()%(args.i+1));
-    int whoami = *(int*)arg;
+    int max_iter = (rand()%(i+1));
+    unsigned long whoami = (unsigned long)arg;
     int j = 0;
     while(max_iter){
+        // this must be here to prevent the block  from being interrupted by the signal.
+        pthread_sigmask(SIG_BLOCK, &sigset, NULL);
         //Brace for excitement
         sleep((rand()%11));
-        //boardCar()
-            // attempt to lock the semaphore, if success, get in the car, else wait in line.
-            if(sem_wait(&sem) != 0){
-                printf("Semaphore Error!");
-                int err = -1;
-                pthread_exit(&err);
-            }
-                printf("\033[0;32m Thread %d: Wooh! I’m about to ride the roller coaster for the ");
-                // one more iteration one
-                j++;
-                //Yay formatting
-                switch(j % 10){
-                    case 1: printf("%d st", j); break;
-                    case 2: printf("%d nd", j); break;
-                    case 3: printf("%d rd", j); break;
-                    default: printf("%d th", j);
-                }
-                printf("time! I have %d iterations left. \033[0m\n", max_iter--);
-            raise(SIGSTOP); // block till signal
-            sem_post(&sem); // unlock the semaphore
-
+        while(notBoarding);
+        if(sem_wait(&sem) == -1) printf("Block was interrupted!"); // should never happen
+        {
+            int tmp;
+            j++;
+            printf("\033[0;32m Thread %ld: Wooh! I’m about to ride the roller coaster for the %d %s time! I have %d iterations left. \033[0m\n",
+                   whoami, // %ld
+                   j,       // %d
+                   ((tmp = (j % 10)) == 1) ? "st" : ((tmp == 2) ? "nd" : ((tmp == 3) ? "rd" : "th")), // %s
+                   max_iter--); // %d
+            // unmask while we are in the coaster so that it  can wake us up after its ready
+            pthread_sigmask(SIG_UNBLOCK, &sigset, NULL);
+            sleep(10);
+        }
+        sem_post(&sem); // this both frees a slot, and signals to the waiting threads in sem_wait() to get up.
     }
-    printf("thread %d: Completed %d iterations on the roller coaster. Exiting.\n", whoami, j);
-    args.n--;
+    printf("\033[0;31m thread %ld: Completed %d iterations on the roller coaster. Exiting. \033[0m\n", whoami, j);
+    p--;
     pthread_exit(0);
 }
 
 //Treated as a bool
 int validate(int argc, char** argv){
     char options;
-    char * end;
+
+    //Usage
+    if( argc < 7 ) {
+      printf("Usage: -n <count> -c <count> -i <count>\n");
+      return 0;
+    }
+    // check for the required arguemnts, p cool builtin actually.
     while ((options = getopt(argc, argv, ":n:c:i:")) != -1) {
         switch (options) {
-            case 'n':
-                args.n = strtol(optarg, &end, 10);
-                if (args.n <= 0) {
-                    printf("invalid n value - %s\n", optarg);
-                    return  EXIT_SUCCESS;
+            case 'n': // finds n
+                n = atoi(optarg);
+                if (n <= 0) {
+                    printf("./roller: invalid n value - %s\n", optarg);
+                    return 0;
+                }
+                p = n;
+                break;
+            case 'c': // finds c
+                c = atoi(optarg);
+                if (c <= 0) {
+                    printf("./roller: invalid c value - %s\n", optarg);
+                    return 0;
                 }
                 break;
-            case 'c':
-                args.c = atoi(optarg);
-                if (args.c <= 0) {
-                    printf("invalid c value - %s\n", optarg);
-                    return  EXIT_SUCCESS;
-                }
-                break;
-            case 'i':
-                args.i = atoi(optarg);
+            case 'i': // finds i
+                i = atoi(optarg);
                 if (i <= 0) {
-                    printf("invalid I value - %s\n", optarg);
-                    return  EXIT_SUCCESS;
+                    printf("./roller: invalid i value - %s\n", optarg);
+                    return 0;
                 }
                 break;
             default:
-                printf(stderr, "Unknown argument %c\n", c);
-                return EXIT_SUCCESS;
+                printf("./roller: invalid option - %c\n", optopt); // args not found are in optopt.
+                return 0;
         }
     }
-    if ((args.c > args.n) || (args.n > 100) || args.c == 0 || args.n == 0 || args.i == 0) {
+    //Peak error handling performance!
+    if ((c > n) || (n > 100) || c == 0 || n == 0 || i == 0) {
         printf("n (>c ) and n (<= 100) arguments required\n");
-        return  EXIT_SUCCESS;
+        return 0;
     }
+    return 1;
+}
+
+//Treated as a bool
+int initSigs(){
+    sigaddset(&sigset, SIGUSR1); // fill in the signal im using to wake the waiting threads
+    int result = sigaction(SIGUSR1, NULL, &old);//Preserve old sig
+    if(result) return 0;
+    new.sa_handler = sighandle; // assign new signal handler function.
+    result = sigaction(SIGUSR1, &new, NULL);
+    if(result) return 0;
+    return 1;
 }
 
 int main(int argc, char** argv) {
-    memset(&args, 0, sizeof(args)); // blowup the stuct
     if(!validate(argc, argv)) return 0;
-    sem_init(&sem, 0, args.c); // start the semaphore with the max # of passenegers per car.
+    if(!initSigs()) return 0;
 
-    //Create car thread
+    // init semaphor
+    sem_init(&sem, 0, c);
+
+        //Create car thread
     pthread_t car;
-    //Start car thread
+        //Start ride
     pthread_create(&car, NULL, coaster, NULL);
 
-    //Enter the passengers
-    pthread_t threads[args.n];
-    //oh hey a rollercoaster!
-    for(int x = 0; x < args.n; x++)
-        pthread_create(&(threads[x]), NULL, passenger, &x);
+        //Enter the passengers
+    threads = (pthread_t *) malloc(sizeof(pthread_t) * n);
+        //oh hey a rollercoaster!
+    for(unsigned long x = 0; x < n; x++)
+        pthread_create(&(threads[x]), NULL, passenger, (void *)x);
 
-    //Wait for the kids to leave the amusement park.
-    for(int x = 0; x < args.n; x++)
+        //Wait for the kids to leave the amusement park.
+    for(int x = 0; x < n; x++)
         pthread_join(threads[x], NULL);
-    sem_destroy(&sem);
+
+        //waitForRide for ride to shutdown.
+    pthread_join(car, NULL);
+
+    sigaction(SIGUSR1, &old, NULL); // revert the signal action
+
+    sem_destroy(&sem); //blow up the semaphor
 
     return 0;
 }
