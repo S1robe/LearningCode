@@ -21,8 +21,8 @@ int notBoarding;
 void sighandle(int sig){}
 
 void wake() {
-    for (int i = 0; i < n; i++)
-        pthread_kill(threads[i], SIGUSR1);
+    for (int g = 0; g < n; g++)
+        pthread_kill(threads[g], SIGUSR1);
 }
 
 void* coaster(void* arg){
@@ -88,7 +88,6 @@ void* passenger(void* arg){
 //Treated as a bool
 int validate(int argc, char** argv){
     char options;
-
     //Usage
     if( argc < 7 ) {
       printf("Usage: -n <count> -c <count> -i <count>\n");
