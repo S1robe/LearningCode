@@ -49,8 +49,7 @@ void wake() {
     if(sleepymagic == 3) sleepymagic = 5;
     else if(sleepymagic == 5) sleepymagic = 3;
 
-	
-    printf("Waking Ticket #'s %d\n", old);
+//    printf("Waking Ticket #'s %d\n", old);
 
     for (int i = 0; i < n; i++)
         if(livingThreads[i] == old){
@@ -109,20 +108,19 @@ void* passenger(void* arg){
         sem_wait(&riding);
         
         livingThreads[whoami] = sleepymagic;
-	printf("%ld New Ticket # %d\n", whoami, sleepymagic);
+//	printf("%ld New Ticket # %d\n", whoami, sleepymagic);
         
         // Register with the car that were on
         {
             pthread_mutex_lock(&board);
                 filledseats++;
             pthread_mutex_unlock(&board);
-//            j++;
-            max_iter--;
-//            printf("Thread %ld: Wooh! I’m about to ride the roller coaster for the %d %s time! I have %d iterations left. \n",
-//                   whoami, // %ld
-//                   j,       // %d
- //                  ((tmp = (j % 10)) == 1) ? "st" : ((tmp == 2) ? "nd" : ((tmp == 3) ? "rd" : "th")), // %s
-//                   max_iter--); // %d
+            j++;
+            printf("Thread %ld: Wooh! I’m about to ride the roller coaster for the %d %s time! I have %d iterations left. \n",
+                   whoami, // %ld
+                   j,       // %d
+                   ((tmp = (j % 10)) == 1) ? "st" : ((tmp == 2) ? "nd" : ((tmp == 3) ? "rd" : "th")), // %s
+                   max_iter--); // %d
 
         }
 
@@ -138,12 +136,12 @@ void* passenger(void* arg){
         
 
            if(max_iter == 0) {
-              //printf("thread %ld: Completed %d iterations on the roller coaster. Exiting. \n",       whoami, j);
+              printf("thread %ld: Completed %d iterations on the roller coaster. Exiting. \n",       whoami, j);
            }
         
         pthread_mutex_lock(&leave);
             leaving--;
-            printf("%ld left at %d\n", whoami, leaving);
+//            printf("%ld left at %d\n", whoami, leaving);
         pthread_mutex_unlock(&leave);
         
         sem_post(&riding); // this both frees a slot, and signals to the waiting threads in sem_wait() to get up.
