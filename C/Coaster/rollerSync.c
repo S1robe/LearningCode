@@ -1,7 +1,6 @@
 /*
  * Name: Garrett Prentice
  * Section: 1002
- * NSHE: 5005870488
  * Description: Simulate a semaphore expressions with a theme park example between passengers and a roller car.
  *
  */
