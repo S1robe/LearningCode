@@ -1,29 +1,19 @@
-//
-// Created by kira on 6/28/22.
-//
 
 #include <iostream>
+#include <stdio.h>
 
-int add(int first, int second){
-    return first + second;
+void warp(int * board){
+    board[0] = 0;
 }
-
 
 int main(){
-    int first {3};
-    int second {7};
-
-    std::cout << "First number : " << first << std::endl;
-    std::cout << "Second number : " << second << std::endl;
-
-    std::cout << "Sum: " << add(first, second) << std::endl;
-
-    return 0;
+    using namespace std;
+    int n;
+    cin >> n;
+    int * a = (int*) malloc(sizeof(int) * (n > 0 ? n : 1));
+    a[0] = 3;
+    cout << a[0] << "\n";
+    warp(a);
+    cout << a[0];
+    
 }
-
-//cout is for pushing to console
-// cin is for pulling from console
-//cerr is explicitly for errors
-//clog is explicitly for
-
-// we can use std::getline(source, variable) to retrieve things that contain spaces from stdout

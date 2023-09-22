@@ -30,7 +30,6 @@ fun arrays(){
 fun coolExample(){
     val wArray1 = arrayOf("24/7", "Multi-tier", "B-to-B" )
     val wArray2 = arrayOf("empowered", "Leveraged", "aligned")
-    val
 }
 
 /**
@@ -40,3 +39,4 @@ fun coolExample(){
 fun main(args: Array<String>){
     coolExample()
 }
+
