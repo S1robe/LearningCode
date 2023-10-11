@@ -51,6 +51,64 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
+
+class _MyHomePageState extends State<MyHomePage> {
+  
+  var selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+
+    Widget page;
+    switch(selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        page = FavoritesPage(); 
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+      return Scaffold(
+        body: Row( 
+          children: [
+            SafeArea(
+              child: NavigationRail(
+                extended: constraints.maxWidth >= 800,
+                destinations: [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.home), 
+                    label: Text('Home'),
+                    ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.favorite), 
+                    label: Text('Favorites'), 
+                    ),
+                ],
+                selectedIndex: selectedIndex,
+                onDestinationSelected: (value) {
+                  setState(() {
+                      selectedIndex = value;  
+                      });
+                  },
+                ),
+            ),
+            Expanded(
+              child: Container(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: page,
+                )
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}
+
 /*
 This is a widget that doesnt have state because it doesnt change
 Stateless widgets seem to be used to hold other stateful widgets.
@@ -58,42 +116,41 @@ Stateless widgets seem to be used to hold other stateful widgets.
 That is to say that stateless widgets would house listeners and watch on 
 stateful widgets, but nothing would watch on them...
 */
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row( 
-        children: [
-          SafeArea(
-            child: NavigationRail(
-              extended: false,
-              destinations: [
-                NavigationRailDestination(
-                  icon: Icon(Icons.home), 
-                  label: Text('Home'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.favorite), 
-                  label: Text('Favorites'), 
-                ),
-              ],
-              selectedIndex: 0,
-              onDestinationSelected: (value) {
-                print('selected $value');
-              },
-            ),
-          ),
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: GeneratorPage(),
-            )
-          )
-        ],
+  State<MyHomePage> createState() => _MyHomePageState(); 
+}
+
+class FavoritesPage extends StatelessWidget {
+  const FavoritesPage({super.key});
+
+  @override
+  Widget build(BuildContext context ) {
+    var appState = context.watch<MyAppState>();
+    
+    List<ListTile> favoritesListTiles = <ListTile>[];
+    for (WordPair pair in appState.favorites){
+      favoritesListTiles.add(ListTile(
+            title: Text(pair.asString),
+            onTap: () {
+              appState.favorites.remove(pair);
+              favoritesListTiles.remove(this);
+            },
+        ));
+    }
+
+    
+    return Center(
+      child: ListView(
+        children: favoritesListTiles,
       ),
     );
+
   }
+
 }
+
 
 class GeneratorPage extends StatelessWidget {
 
@@ -134,7 +191,6 @@ class GeneratorPage extends StatelessWidget {
         ]
       ),
     );
-
   }
 }
 
