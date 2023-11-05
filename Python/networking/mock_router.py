@@ -12,7 +12,6 @@ Assignment 5 - Main Menu (Enter a number)
 2. Add Cost Connection
 3. Run Link-State Algorithm
 4. Run Distance Vector Algorithm
-6. Print Current Configuration
 5. Exit
 """
 
@@ -30,18 +29,6 @@ def add_router(graph, router_name: str) -> bool:
         # router has been added to the list, so it starts dirty (no route table)
         dirty[router_name] = True
         graph.add_node(router_name)
-        return True
-
-
-def remove_router(graph, router_name: str) -> bool:
-    # Router cannot already exist
-    if router_name not in graph.nodes:
-        return False
-    else:
-        # router has been added to the list, so it starts dirty (no route table)
-        dirty[router_name] = True
-        graph.remove_node(router_name)
-        graph.remove_edges_from(list(graph.edges[router_name]))
         return True
 
 
@@ -164,10 +151,11 @@ def validateConfiguration(graph: nx.Graph) -> (bool, list):
     # But if there is less (there cannot be more) nodes in a BFS search
     # then I have unreachable nodes and the configuration is not complete
 
-    src = graph.nodes[0] # The first node in the graph
+    src = list(graph.nodes)[0] # The first node in the graph
     edges = nx.bfs_edges(graph, src)
     nodes = [src] + [v for u, v in edges]
-    return nodes in graph.nodes, nodes
+    missing = set(graph.nodes).difference(set(nodes))
+    return len(missing) == 0, missing
 
 
 # Prints the routing table from start to the rest of the network
@@ -176,13 +164,11 @@ def printRoute(start: str, graph: nx.Graph):
     costs = routes["costs"]
     paths = routes["paths"]
 
-    nodes = graph.nodes
+    nodes = list(graph.nodes)
     nodes.remove(start)
     # Print the routing table
     for end in nodes:
         print(f"{start} -> {end}: Cost {costs[end]} (Path: {paths[end]})")
-
-
     input("press enter to continue...\n")
 
 
@@ -210,7 +196,6 @@ def main():
                     if not add_router(graf, name): # Attempt to add it
                         sendAndClear(f"{name} already exists, please specify another name")
                     printConfiguration(graf)
-
             case 2:
                 clear()
                 if len(graf.nodes) < 2:
@@ -249,12 +234,19 @@ def main():
                                     add_connection(graf, name1, name2, cost)
                                     sendAndClear(f"Routers {name1}, {name2} added to network")
                         printConfiguration(graf)
-
             case 3:
                 clear()
                 if len(graf.nodes) < 2:
-                    sendAndClear(f"Cannot add a cost to less than 2 routers:\n{graf.nodes}")
+                    sendAndClear(f"Cannot add a cost to less than 2 routers:\n{graf.nodes}") 
                 else:
+
+                    valid, missing = validateConfiguration(graf)
+                    if not valid:
+                        print("The following nodes need updates:")
+                        for node in missing:
+                            print(node)
+                        printConfiguration(graf)
+                        break
 
                     name = getRouterName(graf)
                     # If the algorithm has not been run for this node
@@ -270,6 +262,15 @@ def main():
                 if len(graf.nodes) < 2:
                     sendAndClear(f"Cannot add a cost to less than 2 routers:\n{graf.nodes}")
                 else:
+
+                    valid, missing = validateConfiguration(graf)
+                    if not valid:
+                        print("The following nodes need updates:")
+                        for node in missing:
+                            print(node)
+                        printConfiguration(graf)
+                        break
+
                     name = getRouterName(graf)
                     # If the algorithm hasnt been run for this node, 
                     # or the node has not been changed, run the algo.
@@ -283,8 +284,6 @@ def main():
                 clear()
                 print("Exiting....")
                 exit(0)
-            case 6:
-                printConfiguration(graf)
             case _:
                 sendAndClear(f"Not a valid input {choice}")
         # continue
