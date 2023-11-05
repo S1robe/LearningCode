@@ -237,48 +237,45 @@ def main():
             case 3:
                 clear()
                 if len(graf.nodes) < 2:
-                    sendAndClear(f"Cannot add a cost to less than 2 routers:\n{graf.nodes}") 
+                    sendAndClear(f"Cannot operate with less 2 routers:\n{graf.nodes}") 
                 else:
 
                     valid, missing = validateConfiguration(graf)
                     if not valid:
-                        print("The following nodes need updates:")
+                        print("The following nodes need connections:")
                         for node in missing:
                             print(node)
-                        printConfiguration(graf)
-                        break
+                        input("press enter to continue... \n")
+                    else:
+                        name = getRouterName(graf)
+                        # If the algorithm has not been run for this node
+                        # And there has been no change to the node, run the algo
+                        if dirty[name]:
+                            ls_algorithm(graf, name)
 
-                    name = getRouterName(graf)
-                    # If the algorithm has not been run for this node
-                    # And there has been no change to the node, run the algo
-                    if dirty[name]:
-                        ls_algorithm(graf, name)
-
-                    print(f"LS Algorithm (from source {name})")
-                    printRoute(name, graf)
+                        print(f"LS Algorithm (from source {name})")
+                        printRoute(name, graf)
 
             case 4:
                 clear()
                 if len(graf.nodes) < 2:
-                    sendAndClear(f"Cannot add a cost to less than 2 routers:\n{graf.nodes}")
+                    sendAndClear(f"Cannot operate with less than 2 routers:\n{graf.nodes}")
                 else:
-
                     valid, missing = validateConfiguration(graf)
                     if not valid:
-                        print("The following nodes need updates:")
+                        print("The following nodes need connections:")
                         for node in missing:
                             print(node)
-                        printConfiguration(graf)
-                        break
-
-                    name = getRouterName(graf)
-                    # If the algorithm hasnt been run for this node, 
-                    # or the node has not been changed, run the algo.
-                    if dirty[name]:
-                        dv_algorithm(graf, name)
-                    
-                    print(f"DV Algorithm (from source {name})")
-                    printRoute(name, graf)
+                        input("press enter to continue... \n")
+                    else:
+                        name = getRouterName(graf)
+                        # If the algorithm hasnt been run for this node, 
+                        # or the node has not been changed, run the algo.
+                        if dirty[name]:
+                            dv_algorithm(graf, name)
+                        
+                        print(f"DV Algorithm (from source {name})")
+                        printRoute(name, graf)
 
             case 5:
                 clear()
